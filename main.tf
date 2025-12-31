@@ -5,7 +5,7 @@ terraform {
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.0"
+      version = "~> 3.0"
     }
   }
 }
@@ -17,17 +17,17 @@ provider "kubernetes" {
 }
 
 # create namespace
-resource "kubernetes_namespace" "learning" {
+resource "kubernetes_namespace_v1" "learning" {
   metadata {
     name = "kubernetes-study"
   }
 }
 
 # Nginx deployment
-resource "kubernetes_deployment" "nginx" {
+resource "kubernetes_deployment_v1" "nginx" {
   metadata {
     name      = "nginx-deployment"
-    namespace = kubernetes_namespace.learning.metadata[0].name
+    namespace = kubernetes_namespace_v1.learning.metadata[0].name
   }
 
   spec {
@@ -72,16 +72,16 @@ resource "kubernetes_deployment" "nginx" {
 }
 
 # Service (NodePort)
-resource "kubernetes_service" "nginx" {
+resource "kubernetes_service_v1" "nginx" {
   metadata {
     name      = "nginx-service"
-    namespace = kubernetes_namespace.learning.metadata[0].name
+    namespace = kubernetes_namespace_v1.learning.metadata[0].name
   }
 
   spec {
     type = "NodePort"
     selector = {
-      app = kubernetes_deployment.nginx.spec[0].template[0].metadata[0].labels.app
+      app = kubernetes_deployment_v1.nginx.spec[0].template[0].metadata[0].labels.app
     }
 
     port {
@@ -96,7 +96,7 @@ resource "kubernetes_service" "nginx" {
 resource "kubernetes_horizontal_pod_autoscaler_v2" "nginx" {
   metadata {
     name      = "nginx-hpa"
-    namespace = kubernetes_namespace.learning.metadata[0].name
+    namespace = kubernetes_namespace_v1.learning.metadata[0].name
   }
 
   spec {
@@ -106,7 +106,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "nginx" {
     scale_target_ref {
       api_version = "apps/v1"
       kind        = "Deployment"
-      name        = kubernetes_deployment.nginx.metadata[0].name
+      name        = kubernetes_deployment_v1.nginx.metadata[0].name
     }
 
     # autoscaling criteria
