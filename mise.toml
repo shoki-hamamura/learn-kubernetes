@@ -1,0 +1,30 @@
+[tools]
+terraform = "1.10"
+kubectl = "1.32"
+tflint = "latest"
+k9s = "latest"
+gitleaks = "latest"
+
+[tasks.setup]
+description = "Setup git hooks"
+run = "git config core.hooksPath .githooks"
+
+[tasks.lint]
+description = "Run tflint"
+run = "tflint"
+
+[tasks.fmt]
+description = "Format Terraform files"
+run = "terraform fmt"
+
+[tasks.k9s]
+description = "Open k9s"
+run = "k9s"
+
+[tasks.plan]
+description = "Run terraform plan"
+run = "terraform plan"
+
+[tasks.apply]
+description = "Run terraform apply"
+run = "terraform apply"
