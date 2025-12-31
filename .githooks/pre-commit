@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+echo "Running pre-commit checks..."
+
+# terraform fmt check
+echo "Checking terraform format..."
+if ! terraform fmt -check -recursive .; then
+  echo "ERROR: Terraform files are not formatted. Run 'terraform fmt' to fix."
+  exit 1
+fi
+
+# terraform-docs
+echo "Generating terraform docs..."
+terraform-docs markdown table --output-file README.md --output-mode inject .
+git add README.md
+
+# gitleaks (secrets detection)
+echo "Checking for secrets..."
+if ! gitleaks protect --staged --no-banner; then
+  echo "ERROR: Potential secrets detected. Please remove them before committing."
+  exit 1
+fi
+
+echo "All checks passed!"
